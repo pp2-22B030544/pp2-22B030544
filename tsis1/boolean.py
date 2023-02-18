@@ -51,3 +51,4 @@ else:
 #instance
 x ="Zhanel"
 print(isinstance(x, str))  #true
+# comm
