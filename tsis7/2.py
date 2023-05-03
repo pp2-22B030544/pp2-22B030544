@@ -1,67 +1,64 @@
 import pygame
 import os
 
-pygame.init()
-screen_width, screen_height = 500,100
-screen = pygame.display.set_mode((screen_width, screen_height))
 
+pygame.display.set_caption("Bomba")
+def song_state_handler(command, path, state=True):
+    if os.path.exists(path):
 
-music_dir = "C:\Users\Жанель\OneDrive\Изображения\Документы\GitHub\pp2-22B030544\tsis7"
-music_files = os.listdir(music_dir)
-current_music = 0
-pygame.mixer.music.load(music_dir + music_files[current_music])
-
-font = pygame.font.SysFont(None, 24)
-
-key_play = pygame.K_SPACE
-key_stop = pygame.K_ESCAPE
-key_next = pygame.K_RIGHT
-key_prev = pygame.K_LEFT
-
-labels = {
-    key_play: "Play",
-    key_stop: "Stop",
-    key_next: "Next",
-    key_prev: "Previous",
-}
-
-label_pos = {
-    key_play: (50, screen_height - 50),
-    key_stop: (150, screen_height - 50),
-    key_next: (250, screen_height - 50),
-    key_prev: (350, screen_height - 50),
-}
-for key in label_pos:
-    label_text = labels[key]
-    label_surface = font.render(label_text, True, (255, 255, 255))
-    label_rect = label_surface.get_rect(center=label_pos[key])
-    screen.blit(label_surface, label_rect)
-
-pygame.mixer.music.play()
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == key_play:
-                if pygame.mixer.music.get_busy():
-                    pygame.mixer.music.pause()
-                else:
-                    pygame.mixer.music.unpause()
-
-            elif event.key == key_stop:
+        if command == "play\\stop":
+            if state == True:
+                pygame.mixer.music.load(path)
+                pygame.mixer.music.play(0)
+            else:
                 pygame.mixer.music.stop()
 
-            elif event.key == key_next:
-                current_music = (current_music + 1) % len(music_files)
-                pygame.mixer.music.load(music_dir + music_files[current_music])
-                pygame.mixer.music.play()
-                
-            elif event.key == key_prev:
-                current_music = (current_music - 1) % len(music_files)
-                pygame.mixer.music.load(music_dir + music_files[current_music])
-                pygame.mixer.music.play()
+        elif command == "change":
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.play(0) 
 
-    pygame.display.update()
+
+
+
+
+path = os.path.join(os.getcwd(), "music")
+songs = os.listdir(path)
+
+pygame.init()
+
+width, height = 500, 100
+screen = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
+
+font = pygame.font.SysFont(None, 24)
+state = True
+i = 0
+
+run = True
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                state = not state
+                song_state_handler("play\\stop", path + "\\" + songs[i], state)
+
+            if event.key == pygame.K_LEFT:
+                i += 1
+                i = i % len(songs)
+                song_state_handler("change", path + "\\" + songs[i])
+                
+            if event.key == pygame.K_RIGHT:
+                i -= 1
+                i = i % len(songs)
+                song_state_handler("change", path + "\\" + songs[i])
+
+    screen.fill((255, 255, 255))
+
+    song_name = font.render(songs[i], True, (0, 0, 0))
+    screen.blit(song_name, (0,0))
+    
+    pygame.display.flip()
+    clock.tick(60)

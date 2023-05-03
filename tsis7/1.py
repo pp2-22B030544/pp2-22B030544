@@ -1,54 +1,40 @@
 import pygame
-import time
+import math 
+import datetime
+
 pygame.init()
 
-window_size = (829,836)
-window = pygame.display.set_mode(window_size)
+width,height = 800, 800
+screen = pygame.display.set_mode((width,height))
 pygame.display.set_caption("Mickey Mouse Clock")
-clock = pygame.time.Clock()
-mickey = pygame.image.load("C:\Users\Жанель\OneDrive\Изображения\Документы\GitHub\pp2-22B030544\tsis7\mikkey.jpg")
+mickey = pygame.image.load('body.png')
+left_hand = pygame.image.load('left.png')
+right_hand = pygame.image.load('right.png')
 
+clock = pygame.transform.scale(mickey,(width,height))
 
+x, y = width // 2, height // 2
 
-minute_hand = pygame.image.load("C:\Users\Жанель\OneDrive\Изображения\Документы\GitHub\pp2-22B030544\tsis7\right.jpeg")
-second_hand = pygame.image.load("C:\Users\Жанель\OneDrive\Изображения\Документы\GitHub\pp2-22B030544\tsis7\left.jpeg")
-
-
-minute_hand_pos = (window_size[0] // 2, window_size[1] // 2)
-second_hand_pos = (window_size[0] // 2, window_size[1] // 2)
-
-exit = False
-while not exit:
+run = True
+while run:
+    screen.blit(mickey,(0,0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            exit = True
+            run = False
+    
+    time = datetime.datetime.now()
+    min = time.minute 
+    sec = time.second
 
+    minute_angle = -math.radians((min / 60) * 360)
+    minute_hand_rotated = pygame.transform.rotate(right_hand, math.degrees(minute_angle))
+    minute_hand_rect = minute_hand_rotated.get_rect(center=(x, y))
+    screen.blit(minute_hand_rotated, minute_hand_rect)
 
-    current_time = time.localtime()
-    minutes = current_time.tm_min
-    seconds = current_time.tm_sec
-
-
-    minute_angle = (minutes / 60) * 360
-    second_angle = (seconds / 60) * 360
-
-
-    minute_hand_rotated = pygame.transform.rotate(minute_hand, 90-minute_angle)
-    second_hand_rotated = pygame.transform.rotate(second_hand, 90-second_angle)
-
-
-    minute_hand_pos = (window_size[0] // 2 - minute_hand_rotated.get_width() // 2,
-                       window_size[1] // 2 - minute_hand_rotated.get_height() // 2)
-    second_hand_pos = (window_size[0] // 2 - second_hand_rotated.get_width() // 2,
-                       window_size[1] // 2 - second_hand_rotated.get_height() // 2)
-
-
-    window.fill((255, 255, 255))
-
-
-    window.blit(mickey, (0,0))
-    window.blit(minute_hand_rotated, minute_hand_pos)
-    window.blit(second_hand_rotated, second_hand_pos)
+    second_angle =-math.radians((sec / 60) * 360)
+    second_hand_rotated = pygame.transform.rotate(left_hand, math.degrees(second_angle))
+    second_hand_rect = second_hand_rotated.get_rect(center=(x, y))
+    screen.blit(second_hand_rotated, second_hand_rect)
 
     pygame.display.flip()
-    pygame.time.delay(1000)
+
